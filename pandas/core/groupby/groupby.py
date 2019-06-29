@@ -10,7 +10,7 @@ expose these user-facing objects to provide specific functionailty.
 import collections
 from contextlib import contextmanager
 import datetime
-from functools import partial, wraps
+from functools import partial, wraps, partialmethod
 import types
 from typing import FrozenSet, List, Optional, Tuple, Type, Union
 import warnings
@@ -1383,10 +1383,6 @@ class GroupBy(_GroupBy):
         cls.prod = groupby_function('prod', 'prod', np.prod, min_count=0)
         cls.min = groupby_function('min', 'min', np.min, numeric_only=False)
         cls.max = groupby_function('max', 'max', np.max, numeric_only=False)
-        cls.first = groupby_function('first', 'first', first_compat,
-                                     numeric_only=False)
-        cls.last = groupby_function('last', 'last', last_compat,
-                                    numeric_only=False)
 
     @Substitution(name='groupby')
     @Appender(_common_see_also)
@@ -1799,6 +1795,9 @@ class GroupBy(_GroupBy):
             result = result.reindex(self.grouper.result_index)
 
         return result
+
+    first = partialmethod(nth, n=0, dropna='all')
+    last = partialmethod(nth, n=-1, dropna='all')
 
     def quantile(self, q=0.5, interpolation='linear'):
         """
